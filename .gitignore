@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Environment variables
+.env
+.env.local
+
+# Databases
+*.sqlite3
+sensorgram.db
+
+# User uploads / static assets that shouldn't be versioned
+uploads/
+
+# Dependency directories
+node_modules/
+
+# OS specific
+.DS_Store
+Thumbs.db
