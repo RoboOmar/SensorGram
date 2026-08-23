@@ -8,3 +8,9 @@ bcrypt
 passlib
 python-jose
 python-multipart
+aiofiles
+google-generativeai
+requests
+feedparser
+websockets
+python-dotenv
