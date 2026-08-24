@@ -3,9 +3,10 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 from backend.config import settings
 
+connect_args = {"check_same_thread": False, "timeout": 15} if settings.DATABASE_URL.startswith("sqlite") else {}
 engine = create_engine(
     settings.DATABASE_URL,
-    connect_args={"check_same_thread": False, "timeout": 15},  # needed for SQLite
+    connect_args=connect_args,
     pool_size=50,
     max_overflow=50
 )
