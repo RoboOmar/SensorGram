@@ -26,7 +26,9 @@ export function getUserLocal() {
 async function request(method, path, body, isForm = false) {
   const headers = {};
   const token = localStorage.getItem('sg_token');
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (token && token !== 'null' && token !== 'undefined') {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   const opts = { method, headers };
   if (body && !isForm) {
@@ -56,7 +58,19 @@ async function request(method, path, body, isForm = false) {
     } else {
       errMsg = `HTTP ${res.status}`;
     }
-    throw new Error(errMsg);
+    
+    // Globally handle 401 Unauthorized
+    if (res.status === 401) {
+      setToken(null);
+      setUserLocal(null);
+      // Dispatch a custom event so app.js can handle the UI
+      window.dispatchEvent(new Event('auth:unauthorized'));
+    }
+    
+    // Include status in error for upstream catching
+    const error = new Error(errMsg);
+    error.status = res.status;
+    throw error;
   }
   return data;
 }

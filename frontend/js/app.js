@@ -201,12 +201,19 @@ window.addEventListener('DOMContentLoaded', async () => {
   const savedToken = getToken();
   const savedUser = getUserLocal();
   
+  // Listen for global 401s from the fetch wrapper
+  window.addEventListener('auth:unauthorized', () => {
+    setUser(null);
+    openAuthModal('login');
+    showToast('Session expired. Please log in again.', 'error');
+  });
+
   if (savedToken && savedUser) {
     // Optimistic fast login
     setUser(savedUser, savedUser.api_key);
     // Background refresh
     auth.me().then(me => setUser(me, me.api_key)).catch((err) => {
-      if (err.message && err.message.includes('401')) {
+      if (err.status === 401) {
         setToken(null);
         setUser(null);
       }
@@ -216,7 +223,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       const me = await auth.me();
       setUser(me, me.api_key);
     } catch (err) {
-      if (err.message && err.message.includes('401')) {
+      if (err.status === 401) {
         setToken(null);
         setUser(null);
       }
