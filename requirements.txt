@@ -14,3 +14,4 @@ requests
 feedparser
 websockets
 python-dotenv
+psycopg2-binary
