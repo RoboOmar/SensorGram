@@ -27,7 +27,7 @@ def send_test_email(email_to: str):
     except Exception as e:
         print(f"Failed to send email to {email_to}:")
         traceback.print_exc()
-        return False
+        raise e
 
 def send_reset_email(email_to: str, token: str):
     reset_link = f"https://sensorgram.onrender.com/reset-password?token={token}"
@@ -37,6 +37,7 @@ def send_reset_email(email_to: str, token: str):
     msg["From"] = settings.MAIL_FROM
     msg["To"] = email_to
 
+    print(f"Attempting to send email to... {email_to}")
     try:
         if settings.MAIL_PORT == 465:
             server = smtplib.SMTP_SSL(settings.MAIL_SERVER, settings.MAIL_PORT)
@@ -53,4 +54,4 @@ def send_reset_email(email_to: str, token: str):
     except Exception as e:
         print(f"Failed to send password reset email to {email_to}:")
         traceback.print_exc()
-        return False
+        raise e
