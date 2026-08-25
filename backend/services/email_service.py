@@ -1,19 +1,40 @@
-async def send_test_email(email_to: str):
-    print("=" * 40)
-    print("MOCK EMAIL SENT:")
-    print(f"To: {email_to}")
-    print("Subject: Sensorgram - Test Email")
-    print("Body: This is a test email sent via mocked print statement to bypass all network configurations.")
-    print("=" * 40)
-    # The API route already handles returning the 200 success response, we just return here.
-    return True
+import smtplib
+from email.message import EmailMessage
+from backend.config import settings
 
-async def send_reset_email(email_to: str, token: str):
-    reset_link = f"http://localhost:8000/reset-password?token={token}"
-    print("=" * 40)
-    print("MOCK EMAIL SENT:")
-    print(f"To: {email_to}")
-    print("Subject: Sensorgram - Password Reset")
-    print(f"Body: Click the link to reset your password: {reset_link}")
-    print("=" * 40)
-    return True
+def send_test_email(email_to: str):
+    msg = EmailMessage()
+    msg.set_content("This is a test email sent via SMTP from the live server.")
+    msg["Subject"] = "Sensorgram - Test Email"
+    msg["From"] = settings.MAIL_FROM
+    msg["To"] = email_to
+
+    try:
+        with smtplib.SMTP(settings.MAIL_SERVER, settings.MAIL_PORT) as server:
+            if settings.MAIL_USERNAME and settings.MAIL_PASSWORD:
+                server.login(settings.MAIL_USERNAME, settings.MAIL_PASSWORD)
+            server.send_message(msg)
+        print(f"Email sent successfully to {email_to}")
+        return True
+    except Exception as e:
+        print(f"Failed to send email to {email_to}: {e}")
+        return False
+
+def send_reset_email(email_to: str, token: str):
+    reset_link = f"https://sensorgram.onrender.com/reset-password?token={token}"
+    msg = EmailMessage()
+    msg.set_content(f"Click the link to reset your password:\n{reset_link}")
+    msg["Subject"] = "Sensorgram - Password Reset"
+    msg["From"] = settings.MAIL_FROM
+    msg["To"] = email_to
+
+    try:
+        with smtplib.SMTP(settings.MAIL_SERVER, settings.MAIL_PORT) as server:
+            if settings.MAIL_USERNAME and settings.MAIL_PASSWORD:
+                server.login(settings.MAIL_USERNAME, settings.MAIL_PASSWORD)
+            server.send_message(msg)
+        print(f"Password reset email sent to {email_to}")
+        return True
+    except Exception as e:
+        print(f"Failed to send password reset email to {email_to}: {e}")
+        return False

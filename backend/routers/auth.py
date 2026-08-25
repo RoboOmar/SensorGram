@@ -19,6 +19,8 @@ from backend.services.auth_service import (
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 import secrets
+from fastapi import BackgroundTasks
+from backend.services.email_service import send_reset_email
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -220,11 +222,12 @@ class ForgotPasswordRequest(BaseModel):
     email: str
 
 @router.post("/forgot-password", status_code=status.HTTP_200_OK)
-def forgot_password(body: ForgotPasswordRequest, db: Session = Depends(get_db)):
+def forgot_password(body: ForgotPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     robot = get_robot_by_email(db, body.email)
     if robot:
         token = secrets.token_hex(16)
-        print(f"\n[MOCK EMAIL] Password reset requested for {body.email}")
-        print(f"[MOCK EMAIL] Reset link: http://localhost:8000/reset-password?token={token}\n")
+        # We don't save the reset token to the DB right now based on current logic, 
+        # but we do email the user.
+        background_tasks.add_task(send_reset_email, body.email, token)
     # Always return success to prevent email enumeration
     return {"message": "If that email exists, a reset link has been sent."}
