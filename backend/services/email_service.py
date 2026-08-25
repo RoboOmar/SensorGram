@@ -12,9 +12,9 @@ def send_test_email(email_to: str):
 
     try:
         if settings.MAIL_PORT == 465:
-            server = smtplib.SMTP_SSL(settings.MAIL_SERVER, settings.MAIL_PORT)
+            server = smtplib.SMTP_SSL(settings.MAIL_SERVER, settings.MAIL_PORT, timeout=10)
         else:
-            server = smtplib.SMTP(settings.MAIL_SERVER, settings.MAIL_PORT)
+            server = smtplib.SMTP(settings.MAIL_SERVER, settings.MAIL_PORT, timeout=10)
             # If not SSL, we might need STARTTLS
             server.starttls()
             
@@ -25,9 +25,9 @@ def send_test_email(email_to: str):
         print(f"Email sent successfully to {email_to}")
         return True
     except Exception as e:
-        print(f"Failed to send email to {email_to}:")
+        print(f"SMTP Error: {e}")
         traceback.print_exc()
-        raise e
+        return False
 
 def send_reset_email(email_to: str, token: str):
     reset_link = f"https://sensorgram.onrender.com/reset-password?token={token}"
@@ -40,9 +40,9 @@ def send_reset_email(email_to: str, token: str):
     print(f"Attempting to send email to... {email_to}")
     try:
         if settings.MAIL_PORT == 465:
-            server = smtplib.SMTP_SSL(settings.MAIL_SERVER, settings.MAIL_PORT)
+            server = smtplib.SMTP_SSL(settings.MAIL_SERVER, settings.MAIL_PORT, timeout=10)
         else:
-            server = smtplib.SMTP(settings.MAIL_SERVER, settings.MAIL_PORT)
+            server = smtplib.SMTP(settings.MAIL_SERVER, settings.MAIL_PORT, timeout=10)
             server.starttls()
 
         with server:
@@ -52,6 +52,10 @@ def send_reset_email(email_to: str, token: str):
         print(f"Password reset email sent to {email_to}")
         return True
     except Exception as e:
-        print(f"Failed to send password reset email to {email_to}:")
+        print(f"SMTP Error: {e}")
         traceback.print_exc()
-        raise e
+        print("\n" + "=" * 40)
+        print("FALLBACK PASSWORD RESET LINK:")
+        print(reset_link)
+        print("=" * 40 + "\n")
+        return False
