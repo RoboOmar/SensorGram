@@ -1,4 +1,5 @@
 import smtplib
+import traceback
 from email.message import EmailMessage
 from backend.config import settings
 
@@ -10,14 +11,22 @@ def send_test_email(email_to: str):
     msg["To"] = email_to
 
     try:
-        with smtplib.SMTP(settings.MAIL_SERVER, settings.MAIL_PORT) as server:
+        if settings.MAIL_PORT == 465:
+            server = smtplib.SMTP_SSL(settings.MAIL_SERVER, settings.MAIL_PORT)
+        else:
+            server = smtplib.SMTP(settings.MAIL_SERVER, settings.MAIL_PORT)
+            # If not SSL, we might need STARTTLS
+            server.starttls()
+            
+        with server:
             if settings.MAIL_USERNAME and settings.MAIL_PASSWORD:
                 server.login(settings.MAIL_USERNAME, settings.MAIL_PASSWORD)
             server.send_message(msg)
         print(f"Email sent successfully to {email_to}")
         return True
     except Exception as e:
-        print(f"Failed to send email to {email_to}: {e}")
+        print(f"Failed to send email to {email_to}:")
+        traceback.print_exc()
         return False
 
 def send_reset_email(email_to: str, token: str):
@@ -29,12 +38,19 @@ def send_reset_email(email_to: str, token: str):
     msg["To"] = email_to
 
     try:
-        with smtplib.SMTP(settings.MAIL_SERVER, settings.MAIL_PORT) as server:
+        if settings.MAIL_PORT == 465:
+            server = smtplib.SMTP_SSL(settings.MAIL_SERVER, settings.MAIL_PORT)
+        else:
+            server = smtplib.SMTP(settings.MAIL_SERVER, settings.MAIL_PORT)
+            server.starttls()
+
+        with server:
             if settings.MAIL_USERNAME and settings.MAIL_PASSWORD:
                 server.login(settings.MAIL_USERNAME, settings.MAIL_PASSWORD)
             server.send_message(msg)
         print(f"Password reset email sent to {email_to}")
         return True
     except Exception as e:
-        print(f"Failed to send password reset email to {email_to}: {e}")
+        print(f"Failed to send password reset email to {email_to}:")
+        traceback.print_exc()
         return False
