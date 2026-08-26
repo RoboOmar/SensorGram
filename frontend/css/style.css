@@ -672,7 +672,7 @@ body {
 
 /* ── Profile View ────────────────────────────────────────────────── */
 #profile-view {
-  display: none;
+  width: 100%;
 }
 
 .profile-hero {
