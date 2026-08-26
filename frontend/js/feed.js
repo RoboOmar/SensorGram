@@ -65,8 +65,18 @@ export async function loadFeed(reset = false) {
   showSkeletons(reset);
 
   try {
+    console.log('[loadFeed] Fetching posts with skip:', skip);
     const items = await postsApi.feed(skip, 20);
+    console.log('[loadFeed] Received items:', items);
+    
     clearSkeletons();
+    
+    if (!items || !Array.isArray(items)) {
+      console.error('[loadFeed] Items is not an array!', items);
+      showToast('Error: API returned invalid format', 'error');
+      return;
+    }
+
     if (items.length === 0 && _page === 0) {
       showEmpty();
     } else {
@@ -74,8 +84,9 @@ export async function loadFeed(reset = false) {
       _page++;
     }
   } catch (err) {
+    console.error('[loadFeed] Error in fetch or append:', err);
     clearSkeletons();
-    showToast('Failed to load feed', 'error');
+    showToast('Failed to load feed: ' + err.message, 'error');
   } finally {
     _loading = false;
   }

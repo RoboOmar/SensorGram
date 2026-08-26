@@ -6,8 +6,13 @@ import threading
 import asyncio
 import websockets
 import json
+import argparse
 
-BASE_URL = "http://localhost:8000/api"
+parser = argparse.ArgumentParser(description="SensorGram Bot Simulator")
+parser.add_argument("--url", type=str, default="http://localhost:8000/api", help="Base API URL")
+args = parser.parse_args()
+
+BASE_URL = args.url.rstrip("/")
 
 # ── 20 Bot Accounts ──────────────────────────────────────────────────────────
 BOT_NAMES = [

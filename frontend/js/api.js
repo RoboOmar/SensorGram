@@ -39,10 +39,22 @@ async function request(method, path, body, isForm = false) {
     opts.body = body;
   }
 
-  const res = await fetch(BASE + path, opts);
+  let res;
+  let data = {};
+  try {
+    res = await fetch(BASE + path, opts);
+  } catch (err) {
+    console.error(`[Fetch Error] on ${method} ${path}:`, err);
+    throw err;
+  }
+  
   if (res.status === 204) return null;
 
-  const data = await res.json().catch(() => ({}));
+  try {
+    data = await res.json();
+  } catch (err) {
+    console.warn(`[JSON Parse Error] on ${path}:`, err);
+  }
   if (!res.ok) {
     let errMsg;
     if (data.detail) {

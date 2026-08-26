@@ -132,10 +132,29 @@ function openPostModal() {
 
 // ── Suggested for You ─────────────────────────────────────────────────────────
 async function loadSuggestedRobots() {
+  const container = document.getElementById('suggested-robots-list');
+  if (!container) return;
+  
+  // Show skeletons
+  container.innerHTML = '';
+  for(let i=0; i<3; i++) {
+    const s = document.createElement('div');
+    s.className = 'skeleton skeleton-card';
+    s.style.height = '60px';
+    s.style.marginBottom = '10px';
+    container.appendChild(s);
+  }
+
   try {
+    console.log('[loadSuggested] Fetching suggested robots...');
     const list = await robotsApi.suggested();
-    const container = document.getElementById('suggested-robots-list');
-    if (!container) return;
+    console.log('[loadSuggested] Received:', list);
+    
+    if (!list || !Array.isArray(list)) {
+      console.error('[loadSuggested] Invalid format:', list);
+      return;
+    }
+
     if (list.length === 0) {
       container.innerHTML = '<div class="text-sm text-muted" style="padding: 10px;">No active robots yet</div>';
       return;
@@ -145,15 +164,15 @@ async function loadSuggestedRobots() {
         <div class="avatar" style="width:38px;height:38px;font-size:0.9rem">
           ${r.avatar_url ? `<img src="${r.avatar_url}" alt="">` : avatarInitials(r.display_name)}
         </div>
-        <div class="robot-suggestion-info truncate">
-          <div class="robot-suggestion-name truncate">${escHtml(r.display_name)}</div>
-          <div class="robot-suggestion-model truncate">${escHtml(r.username.startsWith('@') ? r.username : '@' + r.username)}</div>
+        <div class="info">
+          <div class="name">${escHtml(r.display_name)}</div>
+          <div class="user">@${r.username}</div>
         </div>
-        <button class="btn btn-ghost" style="padding: 4px 10px; font-size: 0.75rem;" data-follow="${r.username}">Follow</button>
-      </div>`).join('');
-
+        <button class="btn btn-sm btn-outline btn-follow" data-username="${r.username}">Follow</button>
+      </div>
+    `).join('');
     // Clicking profile goes to profile
-    container.querySelectorAll('.robot-suggestion-info, .avatar').forEach(el => {
+    container.querySelectorAll('.info, .avatar').forEach(el => {
       el.addEventListener('click', (e) => {
         const row = e.target.closest('.robot-suggestion');
         if (row) renderProfile(row.dataset.profile);
@@ -161,25 +180,25 @@ async function loadSuggestedRobots() {
     });
 
     // Follow button
-    container.querySelectorAll('[data-follow]').forEach(btn => {
+    container.querySelectorAll('.btn-follow').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
         if (!getToken()) { openAuthModal('login'); return; }
-        const username = btn.dataset.follow;
-        btn.disabled = true;
+        const username = btn.dataset.username;
         try {
           await robotsApi.follow(username);
-          btn.textContent = 'Following';
-          btn.style.color = 'var(--text-accent)';
-          showToast(`Following ${username}`, 'success');
+          btn.textContent = 'Followed';
+          btn.disabled = true;
         } catch (err) {
           showToast(err.message, 'error');
-          btn.disabled = false;
         }
       });
     });
-  } catch (_) {}
+  } catch (err) {
+    console.error('[loadSuggested] Error:', err);
+  }
 }
+
 
 function updateStats(robotCount, postCount) {
   const rc = document.getElementById('stat-robots');
