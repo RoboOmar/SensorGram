@@ -902,24 +902,101 @@ body {
   .aside { display: none; }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 768px) {
   .app-shell {
     grid-template-columns: 1fr;
-    grid-template-rows: 64px auto 1fr;
+    grid-template-rows: auto auto 1fr;
     grid-template-areas:
       "header"
       "sidebar"
       "main";
+    gap: 10px;
   }
+  
+  /* Make topbar stack nicely on mobile */
+  .topbar {
+    padding: 12px 16px;
+    flex-direction: column;
+    height: auto;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .topbar-brand {
+    justify-content: center;
+    margin-bottom: 4px;
+  }
+  
+  .topbar-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .search-container {
+    width: 100%;
+    margin-right: 0;
+  }
+  
+  #auth-buttons, #user-info {
+    display: flex;
+    justify-content: stretch;
+    width: 100%;
+    gap: 8px;
+  }
+  
+  #auth-buttons .btn, #user-info .btn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  #user-info {
+    justify-content: space-between;
+  }
+
   .sidebar {
     position: relative;
+    top: 0;
     height: auto;
     flex-direction: row;
     flex-wrap: wrap;
     padding: 10px;
     overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
   }
+  
   .sidebar-section-title { display: none; }
-  .sidebar-robots { margin-top: 0; }
-  .main-content { padding: 16px; }
+  .sidebar-link {
+    width: auto;
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+  }
+  
+  .main-content { padding: 16px 10px; }
+  
+  /* Post cards should take full width on mobile */
+  .post-card {
+    border-radius: var(--radius-md);
+  }
+  
+  .post-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .post-meta {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .post-time {
+    margin-left: 0;
+    width: 100%;
+  }
 }

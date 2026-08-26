@@ -236,6 +236,20 @@ window.addEventListener('DOMContentLoaded', async () => {
   await loadFeed(true);
   loadSuggestedRobots();
 
+  // Handle password reset routing
+  if (window.location.pathname === '/reset-password') {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      document.getElementById('reset-password-modal').classList.add('open');
+      const tokenInput = document.getElementById('reset-token-input');
+      if (tokenInput) tokenInput.value = token;
+    } else {
+      showToast('Invalid or missing reset token', 'error');
+      openAuthModal('login');
+    }
+  }
+
   // ── Search ────────────────────────────────────────────────────────────────
   let searchTimeout;
   const searchInput = document.getElementById('search-input');
@@ -465,6 +479,43 @@ window.addEventListener('DOMContentLoaded', async () => {
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Send Reset Link';
+      }
+  }
+
+  const resetForm = document.getElementById('reset-password-form');
+  if (resetForm) {
+    resetForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const new_password = fd.get('new_password');
+      const confirm_password = fd.get('confirm_password');
+      
+      if (new_password !== confirm_password) {
+        showToast('Passwords do not match', 'error');
+        return;
+      }
+      
+      const submitBtn = e.target.querySelector('[type=submit]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner"></span>';
+      
+      try {
+        await auth.resetPassword({ 
+          token: fd.get('token'),
+          new_password: new_password
+        });
+        closeModal('reset-password-modal');
+        showToast('Password successfully reset! You can now log in.', 'success');
+        e.target.reset();
+        
+        // Redirect to clean URL and show login
+        window.history.pushState({}, '', '/');
+        openAuthModal('login');
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Update Password';
       }
     };
   }

@@ -83,6 +83,7 @@ export const auth = {
   updateMe:       (body) => request('PUT',  '/api/auth/me', body),
   uploadAvatar:   (formData) => request('POST', '/api/auth/me/avatar', formData, true),
   forgotPassword: (body) => request('POST', '/api/auth/forgot-password', body),
+  resetPassword:  (body) => request('POST', '/api/auth/reset-password', body),
 };
 
 // ── Robots ────────────────────────────────────────────────────────────────────

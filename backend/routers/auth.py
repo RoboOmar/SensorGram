@@ -4,6 +4,7 @@ import uuid
 import shutil
 from sqlalchemy.orm import Session
 import secrets
+from datetime import timedelta
 
 from backend.database import get_db
 from backend.models.robot import Robot
@@ -224,9 +225,36 @@ class ForgotPasswordRequest(BaseModel):
 def forgot_password(body: ForgotPasswordRequest, db: Session = Depends(get_db)):
     robot = get_robot_by_email(db, body.email)
     if robot:
-        token = secrets.token_hex(16)
-        # We don't save the reset token to the DB right now based on current logic, 
-        # but we do email the user.
+        # Generate a 15-minute JWT for stateless password resets
+        token = create_access_token(
+            {"sub": robot.username, "purpose": "reset"},
+            expires_delta=timedelta(minutes=15)
+        )
         send_reset_email(body.email, token)
     # Always return success to prevent email enumeration
     return {"message": "If that email exists, a reset link has been sent."}
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+@router.post("/reset-password", status_code=status.HTTP_200_OK)
+def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
+    payload = decode_token(body.token)
+    if not payload or payload.get("purpose") != "reset":
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+        
+    username = payload.get("sub")
+    if not username:
+        raise HTTPException(status_code=400, detail="Invalid token payload")
+        
+    robot = get_robot_by_username(db, username)
+    if not robot:
+        raise HTTPException(status_code=404, detail="Robot not found")
+        
+    if len(body.new_password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters long")
+        
+    robot.hashed_password = hash_password(body.new_password)
+    db.commit()
+    return {"message": "Password successfully reset."}
