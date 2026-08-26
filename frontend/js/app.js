@@ -306,8 +306,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   // ── Navigation ────────────────────────────────────────────────────────────
   document.getElementById('nav-feed')?.addEventListener('click', (e) => {
     setActive(e.currentTarget);
-    document.getElementById('chat-view').style.display = 'none';
-    document.getElementById('ai-view').style.display = 'none';
+    document.getElementById('chat-view').classList.add('hidden');
+    document.getElementById('ai-view').classList.add('hidden');
     goBackToFeed();
     loadFeed(true);
   });
@@ -315,28 +315,28 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('nav-profile')?.addEventListener('click', (e) => {
     if (!_currentUser) { openAuthModal('login'); return; }
     setActive(e.currentTarget);
-    document.getElementById('chat-view').style.display = 'none';
-    document.getElementById('ai-view').style.display = 'none';
+    document.getElementById('chat-view').classList.add('hidden');
+    document.getElementById('ai-view').classList.add('hidden');
     renderProfile(_currentUser.username);
   });
   
   document.getElementById('nav-chat')?.addEventListener('click', (e) => {
     if (!_currentUser) { openAuthModal('login'); return; }
     setActive(e.currentTarget);
-    document.getElementById('feed-view').style.display = 'none';
-    document.getElementById('profile-view').style.display = 'none';
-    document.getElementById('ai-view').style.display = 'none';
-    document.getElementById('chat-view').style.display = 'flex';
+    document.getElementById('feed-view').classList.add('hidden');
+    document.getElementById('profile-view').classList.add('hidden');
+    document.getElementById('ai-view').classList.add('hidden');
+    document.getElementById('chat-view').classList.remove('hidden');
     initChat();
   });
 
   document.getElementById('nav-ai-expert')?.addEventListener('click', (e) => {
     if (!_currentUser) { openAuthModal('login'); return; }
     setActive(e.currentTarget);
-    document.getElementById('feed-view').style.display = 'none';
-    document.getElementById('profile-view').style.display = 'none';
-    document.getElementById('chat-view').style.display = 'none';
-    document.getElementById('ai-view').style.display = 'flex';
+    document.getElementById('feed-view').classList.add('hidden');
+    document.getElementById('profile-view').classList.add('hidden');
+    document.getElementById('chat-view').classList.add('hidden');
+    document.getElementById('ai-view').classList.remove('hidden');
     initAiExpert();
   });
 

@@ -6,8 +6,10 @@ export async function renderProfile(username) {
   const feedView    = document.getElementById('feed-view');
   const profileView = document.getElementById('profile-view');
 
-  feedView.style.display    = 'none';
-  profileView.style.display = 'block';
+  feedView.classList.add('hidden');
+  document.getElementById('chat-view').classList.add('hidden');
+  document.getElementById('ai-view').classList.add('hidden');
+  profileView.classList.remove('hidden');
   profileView.innerHTML     = buildSkeleton();
 
   try {
@@ -25,9 +27,10 @@ export async function renderProfile(username) {
 }
 
 export function goBackToFeed() {
-  document.getElementById('feed-view').style.display    = 'block';
-  document.getElementById('profile-view').style.display = 'none';
-  document.getElementById('chat-view').style.display = 'none';
+  document.getElementById('feed-view').classList.remove('hidden');
+  document.getElementById('profile-view').classList.add('hidden');
+  document.getElementById('chat-view').classList.add('hidden');
+  document.getElementById('ai-view').classList.add('hidden');
 }
 
 function buildProfileHtml(robot, robotPosts) {
