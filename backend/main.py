@@ -82,6 +82,11 @@ async def test_email_route(req: TestEmailRequest):
             }
         )
 
+@app.get("/reset-password")
+async def reset_password_page():
+    from fastapi.responses import FileResponse
+    return FileResponse("frontend/index.html")
+
 # Serve the frontend SPA — must be last so it doesn't shadow API routes
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
 
