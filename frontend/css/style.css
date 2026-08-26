@@ -60,6 +60,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Fix iOS auto-zoom on inputs */
+input, textarea, select {
+  font-size: 16px !important;
+}
+
 /* ── Scrollbar ───────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #0f172a; }
@@ -1024,5 +1029,50 @@ body {
   .post-time {
     margin-left: 0;
     font-size: 0.75rem;
+  }
+
+  /* Chat and Messages Overrides */
+  .chat-container {
+    flex-direction: column !important;
+  }
+  
+  .chat-sidebar {
+    width: 100% !important;
+    height: 120px !important;
+    min-height: 120px !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding-right: 0 !important;
+    padding-bottom: 10px !important;
+    display: flex !important;
+    flex-direction: row !important; /* Horizontal scroll for contacts on mobile */
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 8px;
+  }
+
+  .chat-user-item {
+    flex: 0 0 auto;
+    flex-direction: column !important;
+    justify-content: center !important;
+    padding: 8px !important;
+    min-width: 70px !important;
+    border-radius: 12px;
+  }
+  
+  .chat-user-item .user-handle, 
+  .chat-user-item .time, 
+  .chat-user-item .preview {
+    display: none !important; /* Hide extra text to just show avatar + name horizontally */
+  }
+
+  .chat-user-item.active {
+    border-left: none !important;
+    border-bottom: 3px solid var(--accent-primary);
+  }
+  
+  .chat-main {
+    border-radius: 0 !important;
+    border: none !important;
   }
 }
