@@ -499,6 +499,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Send Reset Link';
       }
+    };
   }
 
   const resetForm = document.getElementById('reset-password-form');
