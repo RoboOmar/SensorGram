@@ -905,53 +905,72 @@ body {
 @media (max-width: 768px) {
   .app-shell {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto 1fr;
+    grid-template-rows: auto auto 1fr auto;
     grid-template-areas:
       "header"
       "sidebar"
-      "main";
+      "main"
+      "aside";
     gap: 10px;
+    overflow-x: hidden;
   }
   
-  /* Make topbar stack nicely on mobile */
+  .aside {
+    display: block;
+    width: 100%;
+    position: relative;
+    top: 0;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    padding: 16px 10px;
+  }
+  
+  /* Make topbar flex nicely without extreme stretching */
   .topbar {
-    padding: 12px 16px;
-    flex-direction: column;
+    padding: 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
     height: auto;
-    gap: 12px;
-    align-items: stretch;
+    gap: 10px;
+    justify-content: space-between;
   }
   
   .topbar-brand {
-    justify-content: center;
-    margin-bottom: 4px;
+    margin-bottom: 0;
+    flex-shrink: 0;
   }
   
   .topbar-actions {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     width: 100%;
+    justify-content: space-between;
     gap: 8px;
   }
   
   .search-container {
     width: 100%;
-    margin-right: 0;
+    order: 3; /* Push search bar to its own row at the bottom of the navbar */
+    margin: 4px 0 0 0;
   }
   
   #auth-buttons, #user-info {
     display: flex;
-    justify-content: stretch;
-    width: 100%;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: nowrap;
     gap: 8px;
+    order: 2; /* Keep buttons next to brand if possible */
   }
   
   #auth-buttons .btn, #user-info .btn {
-    flex: 1;
-    justify-content: center;
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    font-size: 0.85rem;
   }
   
   #user-info {
-    justify-content: space-between;
+    justify-content: flex-end;
   }
 
   .sidebar {
@@ -959,44 +978,51 @@ body {
     top: 0;
     height: auto;
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     padding: 10px;
     overflow-x: auto;
     border-right: none;
     border-bottom: 1px solid var(--border);
+    scrollbar-width: none; /* Hide scrollbar for neatness */
+  }
+  .sidebar::-webkit-scrollbar {
+    display: none;
   }
   
   .sidebar-section-title { display: none; }
+  
   .sidebar-link {
     width: auto;
-    flex: 1;
-    min-width: 120px;
-    justify-content: center;
+    flex: 0 0 auto;
+    padding: 8px 12px;
   }
   
-  .main-content { padding: 16px 10px; }
+  .main-content { 
+    padding: 12px 8px; 
+    overflow-x: hidden;
+  }
   
-  /* Post cards should take full width on mobile */
   .post-card {
     border-radius: var(--radius-md);
+    margin-bottom: 12px;
   }
   
   .post-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  
-  .post-meta {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
+    flex-direction: row;
     align-items: center;
     gap: 8px;
   }
   
+  .post-meta {
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  
   .post-time {
     margin-left: 0;
-    width: 100%;
+    font-size: 0.75rem;
   }
 }
