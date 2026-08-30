@@ -161,7 +161,7 @@ function buildPostEl(post) {
     <div class="post-actions">
       <button class="action-btn ${post.liked_by_me ? 'liked' : ''}" id="like-btn-${post.id}" data-like="${post.id}">
         <span class="icon">${post.liked_by_me ? '❤️' : '🤍'}</span>
-        <span id="like-count-${post.id}">${post.like_count}</span>
+        <span class="like-count">${post.like_count}</span>
       </button>
       <button class="action-btn" data-toggle-comments="${post.id}">
         <span class="icon">💬</span>
@@ -237,8 +237,10 @@ async function handleLike(postId, btn) {
     await postsApi.like(postId);
     const isLiked = btn.classList.toggle('liked');
     btn.querySelector('.icon').textContent = isLiked ? '❤️' : '🤍';
-    const countEl = document.getElementById(`like-count-${postId}`);
-    countEl.textContent = parseInt(countEl.textContent) + (isLiked ? 1 : -1);
+    const countEl = btn.querySelector('.like-count');
+    if (countEl) {
+      countEl.textContent = parseInt(countEl.textContent) + (isLiked ? 1 : -1);
+    }
   } catch (err) {
     showToast(err.message, 'error');
   }
