@@ -8,7 +8,8 @@ engine = create_engine(
     settings.DATABASE_URL,
     connect_args=connect_args,
     pool_size=50,
-    max_overflow=50
+    max_overflow=50,
+    pool_pre_ping=True
 )
 
 @event.listens_for(engine, "connect")

@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     SECRET_KEY: str = "super_secret_robot_key"
-    DATABASE_URL: str = "sqlite:///./sensorgram.db?check_same_thread=False&timeout=15"
+    DATABASE_URL: str = "postgresql://neondb_owner:npg_PrJzHfmQ15kU@ep-winter-feather-aeezkrbx-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
     UPLOAD_DIR: str = "uploads"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 43200  # 30 days
     AI_API_KEY: str = ""
