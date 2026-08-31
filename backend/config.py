@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     MAILTRAP_API_TOKEN: str = ""
     MAILTRAP_INBOX_ID: str = ""
     RESEND_API_KEY: str = ""
+    IMGBB_API_KEY: str = "636f62e6d041bb873fb620c30a8dce44"
 
     class Config:
         env_file = ".env"
