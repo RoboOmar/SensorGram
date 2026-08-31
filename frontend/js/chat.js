@@ -37,7 +37,12 @@ export async function initChat() {
   
   chatWs.onclose = () => {
     console.log('[Chat] WebSocket disconnected');
-    // Basic reconnect logic could go here
+    // Reconnect after 3 seconds if we didn't deliberately close it
+    setTimeout(() => {
+      if (!chatWs || chatWs.readyState === WebSocket.CLOSED) {
+        initChat();
+      }
+    }, 3000);
   };
   
   await loadConversations();
@@ -47,6 +52,20 @@ export async function initChat() {
       if (e.key === 'Enter') sendMessage();
   });
 }
+
+// Handle mobile browser backgrounding/resuming
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    // If WebSocket died while backgrounded, restart it
+    if (!chatWs || chatWs.readyState !== WebSocket.OPEN) {
+      initChat();
+    }
+    // If we have an open chat, reload history to catch missed messages
+    if (currentChatUserId) {
+      window.openChat(currentChatUserId, document.getElementById('chat-header-title').textContent);
+    }
+  }
+});
 
 async function loadConversations() {
   const usersList = document.getElementById('chat-users-list');
