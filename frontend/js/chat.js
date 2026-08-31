@@ -23,14 +23,13 @@ export async function initChat() {
     const msg = JSON.parse(event.data);
     const currentUser = getUserLocal();
     
-    // If we are currently chatting with the sender (or it's a message we just sent), render it
-    if (msg.sender_id === currentChatUserId || msg.receiver_id === currentChatUserId) {
+    // Strict string comparison to avoid any mobile JS engine quirks
+    if (String(msg.sender_id) === String(currentChatUserId) || String(msg.receiver_id) === String(currentChatUserId)) {
         appendMessage(msg, currentUser.id);
     } else {
-        // Show a toast if someone else messaged us
-        if (msg.sender_id !== currentUser.id) {
+        if (String(msg.sender_id) !== String(currentUser.id)) {
             showToast('New message received!', 'success');
-            loadConversations(); // Update sidebar
+            loadConversations();
         }
     }
   };
@@ -109,7 +108,7 @@ window.openChat = async function(userId, displayName) {
 };
 
 function appendMessage(msg, currentUserId) {
-  const isMine = msg.sender_id === currentUserId;
+  const isMine = String(msg.sender_id) === String(currentUserId);
   const div = document.createElement('div');
   div.className = `chat-bubble ${isMine ? 'mine' : 'theirs'}`;
   div.innerHTML = `
@@ -117,12 +116,18 @@ function appendMessage(msg, currentUserId) {
     <div class="time">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
   `;
   document.getElementById('chat-messages').appendChild(div);
-  scrollToBottom();
+  
+  // Robust scrolling for mobile webkit/blink
+  div.scrollIntoView({ behavior: "smooth", block: "end" });
 }
 
 function scrollToBottom() {
   const container = document.getElementById('chat-messages');
-  container.scrollTop = container.scrollHeight;
+  if (container.lastElementChild) {
+    container.lastElementChild.scrollIntoView({ behavior: "auto", block: "end" });
+  } else {
+    container.scrollTop = container.scrollHeight;
+  }
 }
 
 function sendMessage() {

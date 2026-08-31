@@ -42,7 +42,7 @@ function appendMessage(text, isUser) {
   div.className = `chat-bubble ${isUser ? 'mine' : 'theirs'}`;
   div.innerHTML = `<div class="text">${escHtml(text)}</div>`;
   container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
+  div.scrollIntoView({ behavior: "smooth", block: "end" });
 }
 
 function appendTypingIndicator(id) {
@@ -52,7 +52,7 @@ function appendTypingIndicator(id) {
   div.className = 'chat-bubble theirs';
   div.innerHTML = `<div class="text"><span style="color:var(--text-muted)">Thinking...</span></div>`;
   container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
+  div.scrollIntoView({ behavior: "smooth", block: "end" });
 }
 
 function removeMessage(id) {
