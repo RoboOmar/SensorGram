@@ -332,15 +332,16 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 
   document.getElementById('nav-profile')?.addEventListener('click', (e) => {
-    if (!_currentUser) { openAuthModal('login'); return; }
+    if (!getToken()) { openAuthModal('login'); return; }
+    const user = _currentUser || getUserLocal();
     setActive(e.currentTarget);
     document.getElementById('chat-view').classList.add('hidden');
     document.getElementById('ai-view').classList.add('hidden');
-    renderProfile(_currentUser.username);
+    renderProfile(user.username);
   });
   
   document.getElementById('nav-chat')?.addEventListener('click', (e) => {
-    if (!_currentUser) { openAuthModal('login'); return; }
+    if (!getToken()) { openAuthModal('login'); return; }
     setActive(e.currentTarget);
     document.getElementById('feed-view').classList.add('hidden');
     document.getElementById('profile-view').classList.add('hidden');
@@ -350,7 +351,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 
   document.getElementById('nav-ai-expert')?.addEventListener('click', (e) => {
-    if (!_currentUser) { openAuthModal('login'); return; }
+    if (!getToken()) { openAuthModal('login'); return; }
     setActive(e.currentTarget);
     document.getElementById('feed-view').classList.add('hidden');
     document.getElementById('profile-view').classList.add('hidden');
