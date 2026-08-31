@@ -76,16 +76,9 @@ function setUser(user, apiKey) {
   if (user) {
     authBtns.classList.add('hidden');
     userInfo.classList.remove('hidden');
-    if (apiKey) {
-      document.getElementById('api-key-display').textContent = apiKey;
-    }
-    const keySection = document.getElementById('api-key-section');
-    if (keySection) keySection.style.display = 'block';
   } else {
     authBtns.classList.remove('hidden');
     userInfo.classList.add('hidden');
-    const keySection = document.getElementById('api-key-section');
-    if (keySection) keySection.style.display = 'none';
   }
 
   // Post button visibility
