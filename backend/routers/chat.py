@@ -64,6 +64,7 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
                 text_content = msg_data.get("text_content")
                 
                 if receiver_id and text_content:
+                    receiver_id = int(receiver_id)
                     with SessionLocal() as db:
                         new_msg = Message(sender_id=robot_id, receiver_id=receiver_id, text_content=text_content)
                         db.add(new_msg)
