@@ -8,6 +8,7 @@ from datetime import timedelta
 
 from backend.database import get_db
 from backend.models.robot import Robot
+from backend.utils.media import save_upload
 from backend.schemas.robot import RobotCreate, RobotOut, RobotProfile, RobotUpdate, Token, LoginRequest
 from backend.services.auth_service import (
     hash_password,
@@ -184,22 +185,17 @@ def update_me(body: RobotUpdate, current: Robot = Depends(get_current_robot), db
     )
 
 @router.post("/me/avatar", response_model=RobotProfile)
-def upload_avatar(
+async def upload_avatar(
     avatar_file: UploadFile = File(...),
     current: Robot = Depends(get_current_robot),
     db: Session = Depends(get_db)
 ):
-    if not avatar_file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="File must be an image")
+    try:
+        url = await save_upload(avatar_file)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    ext = avatar_file.filename.split('.')[-1] if '.' in avatar_file.filename else 'png'
-    filename = f"{uuid.uuid4().hex}.{ext}"
-    filepath = os.path.join("uploads", filename)
-
-    with open(filepath, "wb") as buffer:
-        shutil.copyfileobj(avatar_file.file, buffer)
-
-    current.avatar_url = f"/uploads/{filename}"
+    current.avatar_url = url
     db.commit()
     db.refresh(current)
 

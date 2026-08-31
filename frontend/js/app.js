@@ -572,23 +572,21 @@ window.addEventListener('DOMContentLoaded', async () => {
           setToken(updatedUser.access_token);
         }
 
-        // --- HARD UI UPDATE DIRECTLY FROM FORM ---
-        if (typeof _currentUser !== 'undefined' && _currentUser) {
-          _currentUser.display_name = newDisplayName;
-          _currentUser.username = newUsername;
-          setUser(_currentUser, _currentUser.api_key);
-        } else {
-          setUser(updatedUser, updatedUser.api_key);
-        }
+        // Update global state and localStorage with the fresh data from the server
+        setUser(updatedUser, updatedUser.api_key);
 
         // Directly update DOM profile elements if they exist
         const pName = document.querySelector('.profile-name');
         const pHandle = document.querySelector('.profile-handle');
+        const pAvatar = document.querySelector('.profile-header .avatar');
         if (pName) pName.textContent = newDisplayName;
         if (pHandle) pHandle.textContent = newUsername;
+        if (pAvatar && updatedUser.avatar_url) {
+          pAvatar.innerHTML = `<img src="${updatedUser.avatar_url}" alt="">`;
+        }
 
         closeModal('edit-profile-modal');
-        showToast('Profile updated forcefully!', 'success');
+        showToast('Profile updated!', 'success');
         
         // Also update URL to match the new username
         if (window.location.hash.startsWith('#profile')) {
