@@ -311,9 +311,8 @@ async function handleComment(e, postId) {
     if (btn) btn.disabled = false;
   }
 }
-}
 
-// ── Event Delegation ──────────────────────────────────────────────────────────
+//  ── Event Delegation ──────────────────────────────────────────────────────────
 // Single event listener for all comment forms to prevent duplication
 document.addEventListener('submit', (e) => {
   const form = e.target.closest('[data-comment-form]');
@@ -411,4 +410,5 @@ document.addEventListener('click', async (e) => {
     }
   }
 });
+
 
