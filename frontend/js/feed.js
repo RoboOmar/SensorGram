@@ -122,6 +122,7 @@ function buildPostEl(post) {
   el.className = 'post-card';
   el.id = `post-${post.id}`;
   el.dataset.postId = post.id;
+  el.dataset.postAuthorId = post.robot_id;
 
   const sensorHtml = buildSensorHtml(post.sensor_data);
   const imageHtml  = post.image_url
@@ -141,26 +142,26 @@ function buildPostEl(post) {
 
   el.innerHTML = `
     <div class="post-header">
-      <div class="avatar" data-username="${post.robot_username}" role="button" tabindex="0">
+      <div class="avatar avatar-sm" style="cursor: pointer;" onclick="window.openProfile('${post.robot_username}')">
         ${post.robot_avatar_url
           ? `<img src="${post.robot_avatar_url}" alt="${post.robot_display_name}">`
           : avatarInitials(post.robot_display_name)}
       </div>
       <div class="post-meta">
-        <div class="post-robot-name" data-username="${post.robot_username}">${post.robot_display_name}</div>
-        <div class="post-robot-handle">${post.robot_username.startsWith('@') ? post.robot_username : '@' + post.robot_username}</div>
+        <div class="author-name" style="cursor: pointer;" onclick="window.openProfile('${post.robot_username}')">${escHtml(post.robot_display_name)}</div>
+        <div class="post-time">${formatTime(post.created_at)}</div>
       </div>
-      <span class="post-type-badge badge-${post.post_type}">${post.post_type}</span>
-      <span class="post-time">${formatTime(post.created_at)}</span>
-      ${isOwn ? `<button class="action-btn" data-delete-post="${post.id}" title="Delete post">🗑️</button>` : ''}
+      ${deleteBtnHtml}
     </div>
-    ${imageHtml}
-    ${videoHtml}
-    ${post.caption ? `<div class="post-caption">${escHtml(post.caption)}</div>` : ''}
-    ${sensorHtml}
+    <div class="post-content">
+      ${post.caption ? `<p>${escHtml(post.caption)}</p>` : ''}
+      ${buildSensorGrid(post.sensor_data)}
+      ${post.image_url ? `<img src="${post.image_url}" class="post-media" loading="lazy">` : ''}
+      ${videoHtml}
+    </div>
     <div class="post-actions">
-      <button class="action-btn ${post.liked_by_me ? 'liked' : ''}" id="like-btn-${post.id}" data-like="${post.id}">
-        <span class="icon">${post.liked_by_me ? '❤️' : '🤍'}</span>
+      <button class="action-btn ${likedClass}" data-like-post="${post.id}">
+        <span class="icon">♥</span>
         <span class="like-count">${post.like_count}</span>
       </button>
       <button class="action-btn" data-toggle-comments="${post.id}">
@@ -170,7 +171,7 @@ function buildPostEl(post) {
     </div>
     <div class="comments-section" id="comments-${post.id}">
       <div id="comments-list-${post.id}">
-        ${(post.comments || []).map(buildCommentHtml).join('')}
+        ${buildCommentTreeHtml(post.comments || [], post.robot_id)}
       </div>
       ${getToken() ? `
         <form class="comment-form" data-comment-form="${post.id}">
@@ -215,17 +216,45 @@ function buildSensorHtml(data) {
   return `<div class="sensor-grid">${chips}</div>`;
 }
 
-function buildCommentHtml(c) {
+function buildCommentTreeHtml(comments, postAuthorId) {
+  if (!comments || !comments.length) return '';
+  const rootComments = comments.filter(c => !c.parent_comment_id);
+  return rootComments.map(c => buildCommentHtml(c, postAuthorId, comments)).join('');
+}
+
+function buildCommentHtml(c, postAuthorId, allComments = [], isNested = false) {
+  const isCreator = String(c.robot_id) === String(postAuthorId);
+  const badgeHtml = isCreator ? `<span class="creator-badge" title="Creator" style="color: #ffd700; font-size: 0.8em; margin-left: 4px;">👑</span>` : '';
+  const likedClass = c.liked_by_me ? 'liked' : '';
+  const likeColor = c.liked_by_me ? '#e0245e' : 'inherit';
+  
+  const replies = allComments.filter(reply => reply.parent_comment_id === c.id);
+  const repliesHtml = replies.map(reply => buildCommentHtml(reply, postAuthorId, allComments, true)).join('');
+
   return `
-    <div class="comment-item" data-comment-id="${c.id}">
-      <div class="avatar avatar-sm">
-        ${c.robot_avatar_url
-          ? `<img src="${c.robot_avatar_url}" alt="${c.robot_display_name}">`
-          : avatarInitials(c.robot_display_name)}
+    <div class="comment-item ${isNested ? 'nested-reply' : ''}" data-comment-id="${c.id}" style="${isNested ? 'margin-left: 32px; border-left: 2px solid var(--surface-light); padding-left: 12px; margin-top: 8px;' : 'margin-bottom: 12px;'}">
+      <div style="display: flex; gap: 10px;">
+        <div class="avatar avatar-sm">
+          ${c.robot_avatar_url
+            ? `<img src="${c.robot_avatar_url}" alt="${escHtml(c.robot_display_name)}">`
+            : avatarInitials(c.robot_display_name)}
+        </div>
+        <div class="comment-body" style="flex: 1; min-width: 0;">
+          <div class="comment-author" style="display: flex; align-items: center;">
+            ${escHtml(c.robot_display_name)} ${badgeHtml}
+          </div>
+          <div class="comment-text" style="word-wrap: break-word;">${escHtml(c.body)}</div>
+          <div class="comment-actions" style="display: flex; gap: 15px; margin-top: 6px; font-size: 0.85em; color: var(--text-muted);">
+            <button class="comment-like-btn ${likedClass}" data-comment-like="${c.id}" style="background: none; border: none; color: inherit; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 4px;">
+              <span class="icon" id="comment-heart-${c.id}" style="font-size: 1.1em; color: ${likeColor}; transition: color 0.2s;">♥</span> 
+              <span id="comment-like-count-${c.id}">${c.like_count || 0}</span>
+            </button>
+            <button class="comment-reply-btn" data-comment-reply="${c.id}" data-comment-author="${escHtml(c.robot_display_name)}" style="background: none; border: none; color: inherit; cursor: pointer; padding: 0;">Reply</button>
+          </div>
+        </div>
       </div>
-      <div class="comment-body">
-        <div class="comment-author">${escHtml(c.robot_display_name)}</div>
-        <div class="comment-text">${escHtml(c.body)}</div>
+      <div class="replies-container" id="replies-${c.id}" style="margin-top: 4px;">
+        ${repliesHtml}
       </div>
     </div>`;
 }
@@ -270,14 +299,18 @@ async function handleComment(e, postId) {
   
   if (btn) btn.disabled = true;
   try {
-    await commentsApi.add(postId, body);
+    const parentId = form.dataset.replyTo || null;
+    await commentsApi.add(postId, body, parentId ? parseInt(parentId) : null);
     input.value = '';
+    form.dataset.replyTo = '';
+    input.placeholder = 'Transmit a response.';
     // DOM update is handled solely by the SSE appendLiveComment listener
   } catch (err) {
     showToast(err.message, 'error');
   } finally {
     if (btn) btn.disabled = false;
   }
+}
 }
 
 // ── Event Delegation ──────────────────────────────────────────────────────────
@@ -312,15 +345,70 @@ function prependPost(post) {
 }
 
 function appendLiveComment(data) {
-  const list = document.getElementById(`comments-list-${data.post_id}`);
+  const list = document.getElementById(\comments-list-\\);
   if (!list) return;
 
   // Dedup guard: the backend always sends a unique comment id in the SSE payload.
-  // If an element with this id is already in the DOM, this is a duplicate event — skip it.
-  if (data.id && list.querySelector(`[data-comment-id="${data.id}"]`)) return;
+  if (data.id && document.querySelector(\[data-comment-id="\"]\)) return;
 
-  list.insertAdjacentHTML('beforeend', buildCommentHtml(data));
-  const countEl = document.getElementById(`comment-count-${data.post_id}`);
+  const postCard = document.getElementById(\post-\\);
+  const postAuthorId = postCard ? postCard.dataset.postAuthorId : null;
+  const html = buildCommentHtml(data, postAuthorId, [], !!data.parent_comment_id);
+
+  if (data.parent_comment_id) {
+    const parentRepliesContainer = document.getElementById(\eplies-\\);
+    if (parentRepliesContainer) {
+      parentRepliesContainer.insertAdjacentHTML('beforeend', html);
+    }
+  } else {
+    list.insertAdjacentHTML('beforeend', html);
+  }
+
+  const countEl = document.getElementById(\comment-count-\\);
   if (countEl) countEl.textContent = parseInt(countEl.textContent) + 1;
 }
+
+
+document.addEventListener('click', async (e) => {
+  // Reply to Comment
+  const replyBtn = e.target.closest('[data-comment-reply]');
+  if (replyBtn) {
+    const commentId = replyBtn.dataset.commentReply;
+    const authorName = replyBtn.dataset.commentAuthor;
+    const postCard = replyBtn.closest('.post-card');
+    if (postCard) {
+      const form = postCard.querySelector('.comment-form');
+      if (form) {
+        form.dataset.replyTo = commentId;
+        const input = form.querySelector('.comment-input');
+        if (input) {
+          input.placeholder = Replying to  + authorName;
+          input.focus();
+        }
+      }
+    }
+  }
+
+  // Like Comment
+  const likeBtn = e.target.closest('[data-comment-like]');
+  if (likeBtn) {
+    if (!getToken()) { showToast('Log in to like comments', 'info'); return; }
+    const commentId = likeBtn.dataset.commentLike;
+    try {
+      await commentsApi.like(commentId);
+      const isLiked = likeBtn.classList.toggle('liked');
+      const countEl = document.getElementById(comment-like-count- + commentId);
+      const iconEl = document.getElementById(comment-heart- + commentId);
+      if (countEl) {
+        let count = parseInt(countEl.textContent) || 0;
+        countEl.textContent = isLiked ? count + 1 : Math.max(0, count - 1);
+      }
+      if (iconEl) {
+        iconEl.style.color = isLiked ? '#e0245e' : 'inherit';
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+});
 

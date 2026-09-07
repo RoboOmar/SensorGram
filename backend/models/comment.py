@@ -14,6 +14,9 @@ class Comment(Base):
     post_id = Column(Integer, ForeignKey("posts.id"), nullable=False)
     body = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    parent_comment_id = Column(Integer, ForeignKey("comments.id"), nullable=True)
 
     robot = relationship("Robot", back_populates="comments")
     post = relationship("Post", back_populates="comments")
+    likes = relationship("CommentLike", back_populates="comment", cascade="all, delete-orphan")
+    replies = relationship("Comment", backref="parent_comment", remote_side=[id], cascade="all, delete-orphan")

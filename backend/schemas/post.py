@@ -12,7 +12,7 @@ class PostCreate(BaseModel):
 
 class CommentCreate(BaseModel):
     body: str
-
+    parent_comment_id: Optional[int] = None
 
 class CommentOut(BaseModel):
     id: int
@@ -22,6 +22,9 @@ class CommentOut(BaseModel):
     robot_avatar_url: Optional[str]
     body: str
     created_at: datetime
+    parent_comment_id: Optional[int] = None
+    like_count: int = 0
+    liked_by_me: bool = False
 
     model_config = {"from_attributes": True}
 

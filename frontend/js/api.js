@@ -123,8 +123,9 @@ export const posts = {
 
 // ── Comments ──────────────────────────────────────────────────────────────────
 export const comments = {
-  add:    (postId, body) => request('POST',   `/api/comments/${postId}`, { body }),
-  delete: (commentId)    => request('DELETE', `/api/comments/${commentId}`),
+  add:    (postId, body, parentCommentId = null) => request('POST', `/api/comments/${postId}`, { body, parent_comment_id: parentCommentId }),
+  delete: (id) => request('DELETE', `/api/comments/${id}`),
+  like:   (id) => request('POST', `/api/comments/${id}/like`),
 };
 
 export const chat = {

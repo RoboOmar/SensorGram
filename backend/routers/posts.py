@@ -41,7 +41,11 @@ def _coerce_sensor_data(raw) -> Optional[dict]:
     return None
 
 
-def _serialize_comment(c) -> CommentOut:
+def _serialize_comment(c, current: Optional[Robot] = None) -> CommentOut:
+    liked = False
+    if current:
+        liked = any(lk.robot_id == current.id for lk in c.likes)
+
     return CommentOut(
         id=c.id,
         robot_id=c.robot_id,
@@ -50,6 +54,9 @@ def _serialize_comment(c) -> CommentOut:
         robot_avatar_url=c.robot.avatar_url,
         body=c.body,
         created_at=c.created_at,
+        parent_comment_id=c.parent_comment_id,
+        like_count=len(c.likes),
+        liked_by_me=liked,
     )
 
 
@@ -72,7 +79,7 @@ def _serialize_post(post: Post, current: Optional[Robot] = None) -> PostOut:
         post_type=post.post_type,
         like_count=len(post.likes),
         comment_count=len(post.comments),
-        comments=[_serialize_comment(c) for c in post.comments],
+        comments=[_serialize_comment(c, current) for c in post.comments],
         created_at=post.created_at,
         liked_by_me=liked,
     )

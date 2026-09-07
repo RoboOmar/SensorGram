@@ -33,6 +33,7 @@ class Robot(Base):
     posts = relationship("Post", back_populates="robot", cascade="all, delete-orphan")
     comments = relationship("Comment", back_populates="robot", cascade="all, delete-orphan")
     likes = relationship("Like", back_populates="robot", cascade="all, delete-orphan")
+    comment_likes = relationship("CommentLike", back_populates="robot", cascade="all, delete-orphan")
 
     followed = relationship(
         "Robot",
