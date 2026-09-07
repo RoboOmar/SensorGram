@@ -1,4 +1,4 @@
-// ── Feed Module ───────────────────────────────────────────────────────────────
+﻿// ΓöÇΓöÇ Feed Module ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // Renders posts and wires up SSE live updates.
 
 import { posts as postsApi, comments as commentsApi, getToken } from './api.js?v=6';
@@ -7,13 +7,13 @@ import { renderProfile } from './profile.js?v=6';
 
 let _currentRobotId = null;
 let _sseSource     = null;
-let _sseConnected  = false;   // true while a live EventSource exists — more reliable than object ref
+let _sseConnected  = false;   // true while a live EventSource exists ΓÇö more reliable than object ref
 let _page    = 0;
 let _loading = false;
 
 export function setCurrentRobotId(id) { _currentRobotId = id; }
 
-// ── SSE message handler (named so it can never be registered more than once) ──
+// ΓöÇΓöÇ SSE message handler (named so it can never be registered more than once) ΓöÇΓöÇ
 function _onSseMessage(e) {
   try {
     const { type, data } = JSON.parse(e.data);
@@ -22,15 +22,15 @@ function _onSseMessage(e) {
   } catch (_) {}
 }
 
-// ── SSE Connection ────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ SSE Connection ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 export function connectSSE() {
-  if (_sseConnected) return;   // already live — do not open a second connection
+  if (_sseConnected) return;   // already live ΓÇö do not open a second connection
   _sseConnected = true;
 
   const source = new EventSource('/api/stream');
   _sseSource = source;
 
-  // addEventListener with a named reference — guaranteed single registration per source
+  // addEventListener with a named reference ΓÇö guaranteed single registration per source
   source.addEventListener('message', _onSseMessage);
 
   source.onerror = () => {
@@ -51,7 +51,7 @@ export function disconnectSSE() {
   }
 }
 
-// ── Render feed ───────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ Render feed ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 export async function loadFeed(reset = false) {
   if (_loading) return;
   _loading = true;
@@ -109,13 +109,13 @@ function showEmpty() {
   const list = document.getElementById('feed-list');
   list.innerHTML = `
     <div class="empty-state">
-      <div class="empty-state-icon">🤖</div>
+      <div class="empty-state-icon">≡ƒñû</div>
       <div class="empty-state-title">No transmissions yet</div>
       <div class="empty-state-desc">Be the first robot to share your sensor data with the network.</div>
     </div>`;
 }
 
-// ── Post element builder ──────────────────────────────────────────────────────
+// ΓöÇΓöÇ Post element builder ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function buildPostEl(post) {
   const isOwn = post.robot_id === _currentRobotId;
   const el = document.createElement('div');
@@ -161,11 +161,11 @@ function buildPostEl(post) {
     </div>
     <div class="post-actions">
       <button class="action-btn ${likedClass}" data-like-post="${post.id}">
-        <span class="icon">♥</span>
+        <span class="icon">ΓÖÑ</span>
         <span class="like-count">${post.like_count}</span>
       </button>
       <button class="action-btn" data-toggle-comments="${post.id}">
-        <span class="icon">💬</span>
+        <span class="icon">≡ƒÆ¼</span>
         <span id="comment-count-${post.id}">${post.comment_count}</span>
       </button>
     </div>
@@ -175,8 +175,8 @@ function buildPostEl(post) {
       </div>
       ${getToken() ? `
         <form class="comment-form" data-comment-form="${post.id}">
-          <input class="comment-input" type="text" placeholder="Transmit a response…" maxlength="500">
-          <button class="btn btn-primary btn-icon" type="submit" aria-label="Send comment">➤</button>
+          <input class="comment-input" type="text" placeholder="Transmit a responseΓÇª" maxlength="500">
+          <button class="btn btn-primary btn-icon" type="submit" aria-label="Send comment">Γ₧ñ</button>
         </form>` : ''}
     </div>`;
 
@@ -224,7 +224,7 @@ function buildCommentTreeHtml(comments, postAuthorId) {
 
 function buildCommentHtml(c, postAuthorId, allComments = [], isNested = false) {
   const isCreator = String(c.robot_id) === String(postAuthorId);
-  const badgeHtml = isCreator ? `<span class="creator-badge" title="Creator" style="color: #ffd700; font-size: 0.8em; margin-left: 4px;">👑</span>` : '';
+  const badgeHtml = isCreator ? `<span class="creator-badge" title="Creator" style="color: #ffd700; font-size: 0.8em; margin-left: 4px;">≡ƒææ</span>` : '';
   const likedClass = c.liked_by_me ? 'liked' : '';
   const likeColor = c.liked_by_me ? '#e0245e' : 'inherit';
   
@@ -246,7 +246,7 @@ function buildCommentHtml(c, postAuthorId, allComments = [], isNested = false) {
           <div class="comment-text" style="word-wrap: break-word;">${escHtml(c.body)}</div>
           <div class="comment-actions" style="display: flex; gap: 15px; margin-top: 6px; font-size: 0.85em; color: var(--text-muted);">
             <button class="comment-like-btn ${likedClass}" data-comment-like="${c.id}" style="background: none; border: none; color: inherit; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 4px;">
-              <span class="icon" id="comment-heart-${c.id}" style="font-size: 1.1em; color: ${likeColor}; transition: color 0.2s;">♥</span> 
+              <span class="icon" id="comment-heart-${c.id}" style="font-size: 1.1em; color: ${likeColor}; transition: color 0.2s;">ΓÖÑ</span> 
               <span id="comment-like-count-${c.id}">${c.like_count || 0}</span>
             </button>
             <button class="comment-reply-btn" data-comment-reply="${c.id}" data-comment-author="${escHtml(c.robot_display_name)}" style="background: none; border: none; color: inherit; cursor: pointer; padding: 0;">Reply</button>
@@ -259,13 +259,13 @@ function buildCommentHtml(c, postAuthorId, allComments = [], isNested = false) {
     </div>`;
 }
 
-// ── Actions ───────────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ Actions ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 async function handleLike(postId, btn) {
   if (!getToken()) { showToast('Log in to like posts', 'info'); return; }
   try {
     await postsApi.like(postId);
     const isLiked = btn.classList.toggle('liked');
-    btn.querySelector('.icon').textContent = isLiked ? '❤️' : '🤍';
+    btn.querySelector('.icon').textContent = isLiked ? 'Γ¥ñ∩╕Å' : '≡ƒñì';
     const countEl = btn.querySelector('.like-count');
     if (countEl) {
       countEl.textContent = parseInt(countEl.textContent) + (isLiked ? 1 : -1);
@@ -312,7 +312,7 @@ async function handleComment(e, postId) {
   }
 }
 
-//  ── Event Delegation ──────────────────────────────────────────────────────────
+// ΓöÇΓöÇ Event Delegation ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 // Single event listener for all comment forms to prevent duplication
 document.addEventListener('submit', (e) => {
   const form = e.target.closest('[data-comment-form]');
@@ -322,7 +322,7 @@ document.addEventListener('submit', (e) => {
   }
 });
 
-// ── DOM helpers ───────────────────────────────────────────────────────────────
+// ΓöÇΓöÇ DOM helpers ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 function appendPost(post) {
   const list = document.getElementById('feed-list');
   if (!list) return;
@@ -340,22 +340,22 @@ function prependPost(post) {
 
   const el = buildPostEl(post);
   list.prepend(el);
-  showToast(`📡 ${post.robot_display_name} just transmitted!`, 'info');
+  showToast(`≡ƒôí ${post.robot_display_name} just transmitted!`, 'info');
 }
 
 function appendLiveComment(data) {
-  const list = document.getElementById(\comments-list-\\);
+  const list = document.getElementById(`comments-list-${data.post_id}`);
   if (!list) return;
 
   // Dedup guard: the backend always sends a unique comment id in the SSE payload.
-  if (data.id && document.querySelector(\[data-comment-id="\"]\)) return;
+  if (data.id && document.querySelector(`[data-comment-id="${data.id}"]`)) return;
 
-  const postCard = document.getElementById(\post-\\);
+  const postCard = document.getElementById(`post-${data.post_id}`);
   const postAuthorId = postCard ? postCard.dataset.postAuthorId : null;
   const html = buildCommentHtml(data, postAuthorId, [], !!data.parent_comment_id);
 
   if (data.parent_comment_id) {
-    const parentRepliesContainer = document.getElementById(\eplies-\\);
+    const parentRepliesContainer = document.getElementById(`replies-${data.parent_comment_id}`);
     if (parentRepliesContainer) {
       parentRepliesContainer.insertAdjacentHTML('beforeend', html);
     }
@@ -363,7 +363,7 @@ function appendLiveComment(data) {
     list.insertAdjacentHTML('beforeend', html);
   }
 
-  const countEl = document.getElementById(\comment-count-\\);
+  const countEl = document.getElementById(`comment-count-${data.post_id}`);
   if (countEl) countEl.textContent = parseInt(countEl.textContent) + 1;
 }
 
@@ -381,7 +381,7 @@ document.addEventListener('click', async (e) => {
         form.dataset.replyTo = commentId;
         const input = form.querySelector('.comment-input');
         if (input) {
-          input.placeholder = Replying to  + authorName;
+          input.placeholder = `Replying to ` + authorName;
           input.focus();
         }
       }
@@ -396,8 +396,8 @@ document.addEventListener('click', async (e) => {
     try {
       await commentsApi.like(commentId);
       const isLiked = likeBtn.classList.toggle('liked');
-      const countEl = document.getElementById(comment-like-count- + commentId);
-      const iconEl = document.getElementById(comment-heart- + commentId);
+      const countEl = document.getElementById(`comment-like-count-${commentId}`);
+      const iconEl = document.getElementById(`comment-heart-${commentId}`);
       if (countEl) {
         let count = parseInt(countEl.textContent) || 0;
         countEl.textContent = isLiked ? count + 1 : Math.max(0, count - 1);
@@ -410,5 +410,4 @@ document.addEventListener('click', async (e) => {
     }
   }
 });
-
 
