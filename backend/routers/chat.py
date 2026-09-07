@@ -15,23 +15,37 @@ router = APIRouter(prefix="/api/chat", tags=["chat"])
 
 class ConnectionManager:
     def __init__(self):
-        # Maps robot_id -> WebSocket
-        self.active_connections: Dict[int, WebSocket] = {}
+        # Maps robot_id -> List[WebSocket]
+        self.active_connections: Dict[int, List[WebSocket]] = {}
 
     async def connect(self, websocket: WebSocket, robot_id: int):
         await websocket.accept()
-        self.active_connections[robot_id] = websocket
-        logging.info(f"Robot {robot_id} connected to chat")
+        if robot_id not in self.active_connections:
+            self.active_connections[robot_id] = []
+        self.active_connections[robot_id].append(websocket)
+        print(f"[WS] Robot {robot_id} connected. Active tabs/connections: {len(self.active_connections[robot_id])}")
 
-    def disconnect(self, robot_id: int):
+    def disconnect(self, websocket: WebSocket, robot_id: int):
         if robot_id in self.active_connections:
-            del self.active_connections[robot_id]
-            logging.info(f"Robot {robot_id} disconnected from chat")
+            if websocket in self.active_connections[robot_id]:
+                self.active_connections[robot_id].remove(websocket)
+            if not self.active_connections[robot_id]:
+                del self.active_connections[robot_id]
+        print(f"[WS] Robot {robot_id} disconnected. Remaining connections: {len(self.active_connections.get(robot_id, []))}")
 
     async def send_personal_message(self, message: str, robot_id: int):
-        ws = self.active_connections.get(robot_id)
-        if ws:
-            await ws.send_text(message)
+        print(f"[WS] Routing message to robot_id {robot_id}")
+        connections = self.active_connections.get(robot_id, [])
+        if not connections:
+            print(f"[WS] FAILED: No active connections found for robot_id {robot_id}")
+            return
+            
+        print(f"[WS] SUCCESS: Found {len(connections)} connections for robot_id {robot_id}. Sending...")
+        for ws in connections:
+            try:
+                await ws.send_text(message)
+            except Exception as e:
+                print(f"[WS] ERROR sending to a connection for robot_id {robot_id}: {e}")
 
 manager = ConnectionManager()
 
@@ -84,7 +98,7 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
                 pass
             
     except WebSocketDisconnect:
-        manager.disconnect(robot_id)
+        manager.disconnect(websocket, robot_id)
 
 @router.get("/history/{user_id}", response_model=List[MessageOut])
 def get_chat_history(user_id: int, db: Session = Depends(get_db), current_robot: Robot = Depends(get_current_robot)):
