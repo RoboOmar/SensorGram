@@ -19,4 +19,8 @@ class Comment(Base):
     robot = relationship("Robot", back_populates="comments")
     post = relationship("Post", back_populates="comments")
     likes = relationship("CommentLike", back_populates="comment", cascade="all, delete-orphan")
-    replies = relationship("Comment", backref="parent_comment", remote_side=[id], cascade="all, delete-orphan")
+    
+    # Self-referential relationship for replies
+    parent_comment = relationship("Comment", remote_side=[id], back_populates="replies")
+    replies = relationship("Comment", back_populates="parent_comment", cascade="all, delete-orphan")
+
