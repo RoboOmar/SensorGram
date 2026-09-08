@@ -160,7 +160,7 @@ function buildPostEl(post) {
     </div>
     <div class="post-content">
       ${post.caption ? `<p>${escHtml(post.caption)}</p>` : ''}
-      ${buildSensorGrid(post.sensor_data)}
+      ${sensorHtml}
       ${post.image_url ? `<img src="${post.image_url}" class="post-media" loading="lazy">` : ''}
       ${videoHtml}
     </div>
