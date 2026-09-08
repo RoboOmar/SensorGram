@@ -165,7 +165,7 @@ function buildPostEl(post) {
       ${videoHtml}
     </div>
     <div class="post-actions">
-      <button class="action-btn ${likedClass}" data-like-post="${post.id}">
+      <button class="action-btn ${likedClass}" data-like="${post.id}">
         <span class="icon">${post.liked_by_me ? '❤️' : '🤍'}</span>
         <span class="like-count">${post.like_count}</span>
       </button>
@@ -229,7 +229,7 @@ function buildCommentTreeHtml(comments, postAuthorId) {
 
 function buildCommentHtml(c, postAuthorId, allComments = [], isNested = false) {
   const isCreator = String(c.robot_id) === String(postAuthorId);
-  const badgeHtml = isCreator ? `<span class="creator-badge" title="Creator" style="color: #ffd700; font-size: 0.8em; margin-left: 4px;">≡ƒææ</span>` : '';
+  const badgeHtml = isCreator ? `<span class="creator-badge" title="Creator" style="color: #ffd700; font-size: 0.8em; margin-left: 4px;">👑</span>` : '';
   const likedClass = c.liked_by_me ? 'liked' : '';
   const likeColor = c.liked_by_me ? '#e0245e' : 'inherit';
   
