@@ -440,8 +440,10 @@ input, textarea, select {
 
 .post-image {
   width: 100%;
-  max-height: 360px;
-  object-fit: cover;
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-top: 10px;
 }
 
 .post-caption {

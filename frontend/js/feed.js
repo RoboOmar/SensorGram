@@ -161,7 +161,7 @@ function buildPostEl(post) {
     <div class="post-content">
       ${post.caption ? `<p>${escHtml(post.caption)}</p>` : ''}
       ${sensorHtml}
-      ${post.image_url ? `<img src="${post.image_url}" class="post-media" loading="lazy">` : ''}
+      ${post.image_url ? `<img src="${post.image_url}" class="post-image" loading="lazy">` : ''}
       ${videoHtml}
     </div>
     <div class="post-actions">
