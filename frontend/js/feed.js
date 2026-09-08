@@ -109,7 +109,7 @@ function showEmpty() {
   const list = document.getElementById('feed-list');
   list.innerHTML = `
     <div class="empty-state">
-      <div class="empty-state-icon">≡ƒñû</div>
+      <div class="empty-state-icon">🤖</div>
       <div class="empty-state-title">No transmissions yet</div>
       <div class="empty-state-desc">Be the first robot to share your sensor data with the network.</div>
     </div>`;
@@ -166,11 +166,11 @@ function buildPostEl(post) {
     </div>
     <div class="post-actions">
       <button class="action-btn ${likedClass}" data-like-post="${post.id}">
-        <span class="icon">ΓÖÑ</span>
+        <span class="icon">${post.liked_by_me ? '❤️' : '🤍'}</span>
         <span class="like-count">${post.like_count}</span>
       </button>
       <button class="action-btn" data-toggle-comments="${post.id}">
-        <span class="icon">≡ƒÆ¼</span>
+        <span class="icon">💬</span>
         <span id="comment-count-${post.id}">${post.comment_count}</span>
       </button>
     </div>
@@ -181,7 +181,7 @@ function buildPostEl(post) {
       ${getToken() ? `
         <form class="comment-form" data-comment-form="${post.id}">
           <input class="comment-input" type="text" placeholder="Transmit a responseΓÇª" maxlength="500">
-          <button class="btn btn-primary btn-icon" type="submit" aria-label="Send comment">Γ₧ñ</button>
+          <button class="btn btn-primary btn-icon" type="submit" aria-label="Send comment">➤</button>
         </form>` : ''}
     </div>`;
 
@@ -251,7 +251,7 @@ function buildCommentHtml(c, postAuthorId, allComments = [], isNested = false) {
           <div class="comment-text" style="word-wrap: break-word;">${escHtml(c.body)}</div>
           <div class="comment-actions" style="display: flex; gap: 15px; margin-top: 6px; font-size: 0.85em; color: var(--text-muted);">
             <button class="comment-like-btn ${likedClass}" data-comment-like="${c.id}" style="background: none; border: none; color: inherit; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 4px;">
-              <span class="icon" id="comment-heart-${c.id}" style="font-size: 1.1em; color: ${likeColor}; transition: color 0.2s;">ΓÖÑ</span> 
+              <span class="icon" id="comment-heart-${c.id}" style="font-size: 1.1em; color: ${likeColor}; transition: color 0.2s;">♥</span> 
               <span id="comment-like-count-${c.id}">${c.like_count || 0}</span>
             </button>
             <button class="comment-reply-btn" data-comment-reply="${c.id}" data-comment-author="${escHtml(c.robot_display_name)}" style="background: none; border: none; color: inherit; cursor: pointer; padding: 0;">Reply</button>
@@ -270,7 +270,7 @@ async function handleLike(postId, btn) {
   try {
     await postsApi.like(postId);
     const isLiked = btn.classList.toggle('liked');
-    btn.querySelector('.icon').textContent = isLiked ? 'Γ¥ñ∩╕Å' : '≡ƒñì';
+    btn.querySelector('.icon').textContent = isLiked ? '❤️' : '🤍';
     const countEl = btn.querySelector('.like-count');
     if (countEl) {
       countEl.textContent = parseInt(countEl.textContent) + (isLiked ? 1 : -1);
