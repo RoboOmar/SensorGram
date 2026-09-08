@@ -34,6 +34,15 @@ def get_db():
 
 
 def init_db():
-    """Create all tables on startup."""
-    from backend.models import robot, post, like, comment  # noqa: F401 – register models
+    """Create all tables on startup and apply missing schema migrations."""
+    from backend.models import robot, post, like, comment, comment_like  # noqa: F401
     Base.metadata.create_all(bind=engine)
+
+    from sqlalchemy import text
+    try:
+        with engine.begin() as conn:
+            # Safely attempt to add the parent_comment_id column if it doesn't exist
+            conn.execute(text("ALTER TABLE comments ADD COLUMN IF NOT EXISTS parent_comment_id INTEGER REFERENCES comments(id)"))
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Could not apply column migration (it may already exist): {e}")
