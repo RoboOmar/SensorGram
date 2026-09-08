@@ -434,10 +434,19 @@ window.addEventListener('DOMContentLoaded', async () => {
       const sensorRaw = fd.get('sensor_data');
 
       // Validate sensor JSON if provided
-      if (sensorRaw) {
-        try { JSON.parse(sensorRaw); } catch (_) {
-          showToast('Sensor data must be valid JSON', 'error'); return;
+      if (sensorRaw && sensorRaw.trim()) {
+        try {
+          const parsed = JSON.parse(sensorRaw);
+          if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+            showToast('Sensor data must be a JSON object', 'error');
+            return;
+          }
+        } catch (_) {
+          showToast('Sensor data must be valid JSON', 'error');
+          return;
         }
+      } else {
+        fd.delete('sensor_data'); // ensure it's empty so we don't send whitespace
       }
 
       const submitBtn = e.target.querySelector('[type=submit]');

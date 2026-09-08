@@ -190,14 +190,14 @@ async def create_post(
         if sensor_data and sensor_data.strip():
             try:
                 parsed = json.loads(sensor_data)
-            except json.JSONDecodeError:
+            except (json.JSONDecodeError, ValueError, TypeError):
                 raise HTTPException(
-                    status_code=422,
+                    status_code=400,
                     detail="sensor_data must be valid JSON (e.g. {\"temperature\": 72.4})"
                 )
             if not isinstance(parsed, dict):
                 raise HTTPException(
-                    status_code=422,
+                    status_code=400,
                     detail="sensor_data must be a JSON object (dict), not a scalar or array"
                 )
             sensor_json = parsed
